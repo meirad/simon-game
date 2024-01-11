@@ -4,6 +4,7 @@ let gameCount;
 let userCount;
 let level = 0;
 let userClickCount = 0; 
+let audio1 = new Audio('https://s3.amazonaws.com/freecodecamp/simonSound1.mp3');
 
 let clickred = document.getElementById("red");
 let clickblue = document.getElementById("blue");
