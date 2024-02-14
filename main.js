@@ -1,75 +1,170 @@
-
-let arrRound = [];
-let gameCount;
-let userCount;
 let level = 0;
-let userClickCount = 0; 
+let currentStep = 0;
+let arrRound = [];
+let chosenColor = createStep();
+let maxLevel = 10;
+let bestScore = 0;
+
 let audio1 = new Audio('https://s3.amazonaws.com/freecodecamp/simonSound1.mp3');
+let audio2 = new Audio('https://s3.amazonaws.com/freecodecamp/simonSound2.mp3');
+let audio3 = new Audio('https://s3.amazonaws.com/freecodecamp/simonSound3.mp3');
+let audio4 = new Audio('https://s3.amazonaws.com/freecodecamp/simonSound4.mp3');
+let lost = new Audio('https://www.soundjay.com/misc/sounds/fail-buzzer-01.mp3');
 
-let clickred = document.getElementById("red");
-let clickblue = document.getElementById("blue");
-let clickgreen = document.getElementById("green");
-let clickyellow = document.getElementById("yellow");
+let clickred = document.getElementById('red');
+let clickblue = document.getElementById('blue');
+let clickgreen = document.getElementById('green');
+let clickyellow = document.getElementById('yellow');
 
-clickred.addEventListener("click", () => playround(1));
-clickblue.addEventListener("click", () => playround(2));
-clickgreen.addEventListener("click", () => playround(3));
-clickyellow.addEventListener("click",() =>  playround(4));
+clickred.addEventListener("click", () => {
+    playround('red');
+    audio1.play();
+    clickred.style.backgroundColor = "rgb(255, 0, 0, 0.5)";
+    audio1.onended = () => {
+        clickred.style.backgroundColor = "red";
+    };
+});
 
-function initGame() {
-    console.clear();
-    gameCount = userCount = 1;
-    arrRound = [];
-    console.log('Initializing game... ');
-}
+clickblue.addEventListener("click", () => {
+    playround('blue');
+    audio2.play();
+    clickblue.style.backgroundColor = "rgb(0, 0, 255, 0.5)";
+    audio2.onended = () => {
+        clickblue.style.backgroundColor = "blue";
+    };
+});
 
-let isGameTurn = false;
+clickgreen.addEventListener("click", () => {
+    playround('green');
+    audio3.play();
+    clickgreen.style.backgroundColor = "rgb(0, 255, 0, 0.5)";
+    audio3.onended = () => {
+        clickgreen.style.backgroundColor = "green";
+    };
+});
 
-function userTurn() {
-    return new Promise((resolve) => {
-        console.log(arrRound);
-        let i = 0;
-        const intervalId = setInterval(() => {
-            if (i >= arrRound.length) {
-                clearInterval(intervalId);
-                resolve();
+clickyellow.addEventListener("click", () => {
+    playround('yellow');
+    audio4.play();
+    clickyellow.style.backgroundColor = "rgb(255, 255, 0, 0.5)";
+    audio4.onended = () => {
+        clickyellow.style.backgroundColor = "yellow";
+    };
+});
+document.getElementById("btnstart").addEventListener("click", function startGame() {
+    chosenColor = createStep();
+    arrRound.push(chosenColor);
+    userTurn();
+    this.removeEventListener("click", startGame);
+    this.style.display = 'none';
+});
+
+function playround(color) {
+    if (color === arrRound[currentStep]) {
+        currentStep++;
+        if (currentStep === arrRound.length) {
+            level++;
+
+            localStorage.setItem('level', level);
+            document.getElementById('levels').innerHTML = level ;
+            
+            if (level > maxLevel) {
+                alert('You win');
+                reset();
             } else {
-                playColor(arrRound[i]);
-                i++;
+                currentStep = 0;
+                const nextSequence = createStep();
+                arrRound.push(nextSequence);
+                setTimeout(userTurn, 1000);
             }
-        }, 1000);
-    });
-}
-
-function playColor(color) {
-    if (color === 'red') {
-        clickred.style.backgroundColor = "rgb(255, 0, 0, 0.5)";
-        audio1.play();
-        setTimeout(() => {
-            clickred.style.backgroundColor = "red";
-        }, 1000);
-    } else if (color === 'blue') {
-        clickblue.style.backgroundColor = "rgb(0, 0, 255, 0.5)";
-        audio2.play();
-        setTimeout(() => {
-            clickblue.style.backgroundColor = "blue";
-        }, 1000);
-    } else if (color === 'green') {
-        clickgreen.style.backgroundColor = "rgb(0, 255, 0, 0.5)";
-        audio3.play();
-        setTimeout(() => {
-            clickgreen.style.backgroundColor = "green";
-        }, 1000);
-    } else if (color === 'yellow') {
-        clickyellow.style.backgroundColor = "rgb(255, 255, 0, 0.5)";
-        audio4.play();
-        setTimeout(() => {
-            clickyellow.style.backgroundColor = "yellow";
-        }, 1000);
+        }
+    } else {lost.play()
+        alert('You pressed the wrong color, you are out');
+        reset();
     }
 }
-    document.getElementById("btnstart").addEventListener("click", () => {
-        isGameTurn = true;
-        playround(createStep());
-        isGameTurn = false;
-    });
+
+function createStep() {
+    const tiles = ['red', 'green', 'blue', 'yellow'];
+    const pickcolor = tiles[Math.floor(Math.random() * tiles.length)];
+    return pickcolor;
+}
+
+function userTurn() {
+
+console.log(arrRound);
+for (let i = 0; i < arrRound.length; i++) {
+    setTimeout(() => {
+        if (arrRound[i] === 'red') {
+            setTimeout(() => {
+                clickred.style.backgroundColor = "rgb(255, 0, 0, 0.5)";
+                audio1.play();
+                setTimeout(() => {
+                    clickred.style.backgroundColor = "red";
+                }, 1000);
+            }, 1000 * i);
+        }
+        else if(arrRound[i] === 'blue') {
+            setTimeout(() => {
+                clickblue.style.backgroundColor = "rgb(0, 0, 255, 0.5)";
+                audio2.play();
+                setTimeout(() => {
+                    clickblue.style.backgroundColor = "blue";
+                }, 1000);
+            }, 1000 * i);
+        }
+        else if(arrRound[i] === 'green'){ 
+            setTimeout(() => {
+                clickgreen.style.backgroundColor = "rgb(0, 255, 0, 0.5)";
+                audio3.play();
+                setTimeout(() => {
+                    clickgreen.style.backgroundColor = "green";
+                }, 1000);
+            }, 1000 * i);
+        }
+        else if(arrRound[i] === 'yellow'){ 
+            setTimeout(() => {
+                clickyellow.style.backgroundColor = "rgb(255, 255, 0, 0.5)";
+                audio4.play();
+                setTimeout(() => {
+                    clickyellow.style.backgroundColor = "yellow";
+                }, 1000);
+            }, 1000 * i);
+        }
+        
+    }, 500 * i);
+}
+}
+
+
+
+function updateBestScore() {
+    let level = parseInt(localStorage.getItem('level')) || 0;
+    let bestScore = parseInt(localStorage.getItem('bestScore')) || 0;
+
+    if (level > bestScore) {
+        bestScore = level;
+        localStorage.setItem('bestScore', bestScore);
+    }
+
+    let maxLevel = parseInt(localStorage.getItem('maxLevel')) || 0;
+    let victoryMessage = `You won the game! ${maxLevel} levels completed!`;
+    if (bestScore === maxLevel) {
+        alert(victoryMessage);
+    } else {
+        document.getElementById('scoreboredoutput').innerHTML = `Best score: ${bestScore}`;
+    }
+
+}
+updateBestScore();
+
+
+function reset() {
+    location.reload();
+
+}
+
+
+let resetButton = document.getElementById('reset');
+resetButton.style.display = 'none';
+resetButton.addEventListener('click', reset);
