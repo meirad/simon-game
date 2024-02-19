@@ -69,7 +69,8 @@ function playround(color) {
             document.getElementById('levels').innerHTML = level ;
             
             if (level > maxLevel) {
-                alert('You win');
+                let victoryMessage = `You won the game! ${maxLevel} levels completed!`;
+                alert(victoryMessage);
                 reset();
             } else {
                 currentStep = 0;
@@ -138,25 +139,22 @@ for (let i = 0; i < arrRound.length; i++) {
 
 
 
-function updateBestScore() {
+function updateBestScore(maxLevel) {
     let level = parseInt(localStorage.getItem('level')) || 0;
     let bestScore = parseInt(localStorage.getItem('bestScore')) || 0;
 
-    if (level > bestScore) {
+    if (level > maxLevel) {
+        bestScore = 0; 
+        localStorage.setItem('bestScore', bestScore);
+    } else if (level > bestScore) {
         bestScore = level;
         localStorage.setItem('bestScore', bestScore);
     }
 
-    let maxLevel = parseInt(localStorage.getItem('maxLevel')) || 0;
-    let victoryMessage = `You won the game! ${maxLevel} levels completed!`;
-    if (bestScore === maxLevel) {
-        alert(victoryMessage);
-    } else {
-        document.getElementById('scoreboredoutput').innerHTML = `Best score: ${bestScore}`;
-    }
-
+    document.getElementById('scoreboredoutput').innerHTML = `Best score: ${bestScore}`;
 }
-updateBestScore();
+
+updateBestScore(10);
 
 
 function reset() {
